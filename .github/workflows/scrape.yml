@@ -2,46 +2,51 @@ name: Medex Scraper
 
 on:
   workflow_dispatch:
-    inputs:
-      start:
-        description: "Start Row"
-        required: true
-
-      end:
-        description: "End Row"
-        required: true
 
 jobs:
 
   scrape:
 
+    strategy:
+      fail-fast: false
+
+      matrix:
+        batch:
+          - [0,300]
+          - [300,600]
+          - [600,900]
+          - [900,1200]
+          - [1200,1500]
+          - [1500,1800]
+          - [1800,2100]
+          - [2100,2400]
+          - [2400,2700]
+          - [2700,3000]
+
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v1
 
-      - name: Install Packages
+      - name: Install
         run: |
           pip install -r requirements.txt
 
       - name: Run Scraper
         run: |
           python scripts/scrape.py \
-          ${{ github.event.inputs.start }} \
-          ${{ github.event.inputs.end }}
+          ${{ matrix.batch[0] }} \
+          ${{ matrix.batch[1] }}
 
       - name: Upload Excel
         uses: actions/upload-artifact@v4
         with:
-          name: output-${{ github.event.inputs.start }}
+          name: output-${{ matrix.batch[0] }}
           path: data/output/
