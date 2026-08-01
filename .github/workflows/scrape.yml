@@ -1,0 +1,47 @@
+name: Medex Scraper
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "Start Row"
+        required: true
+
+      end:
+        description: "End Row"
+        required: true
+
+jobs:
+
+  scrape:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Packages
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Scraper
+        run: |
+          python scripts/scrape.py \
+          ${{ github.event.inputs.start }} \
+          ${{ github.event.inputs.end }}
+
+      - name: Upload Excel
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-${{ github.event.inputs.start }}
+          path: data/output/
