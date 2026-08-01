@@ -17,7 +17,13 @@ import sys
 
 START = int(sys.argv[1])
 END = int(sys.argv[2])
-excel_file = f"data/output/medicine_details_{START}_{END}.xlsx"
+output_dir = "data/output"
+os.makedirs(output_dir, exist_ok=True)
+
+excel_file = os.path.join(
+    output_dir,
+    f"medicine_details_{START}_{END}.xlsx"
+)
 
 if not os.path.exists(excel_file):
 
